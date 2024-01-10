@@ -1,0 +1,12 @@
+{
+    "name": "typo3/azure",
+    "require": {
+        "microsoft/azure-storage-blob": "^1.5",
+        "psr/http-message": "^1.0"
+    },
+	"config": {
+		"platform": {
+			"php": "7.4.8"
+		}
+	}
+}

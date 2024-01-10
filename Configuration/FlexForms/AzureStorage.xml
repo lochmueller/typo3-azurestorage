@@ -28,7 +28,7 @@
                             <config>
                                 <type>input</type>
                                 <size>30</size>
-                                <eval>required,nospace,lower,alphanum_x</eval>
+                                <eval>nospace,lower,alphanum_x</eval>
                                 <max>63</max>
                             </config>
                         </TCEforms>
@@ -39,7 +39,7 @@
                             <config>
                                 <type>input</type>
                                 <size>30</size>
-                                <eval>required,nospace,lower</eval>
+                                <eval>nospace,lower</eval>
                                 <max>24</max>
                             </config>
                         </TCEforms>
@@ -50,10 +50,27 @@
                             <config>
                                 <type>input</type>
                                 <size>30</size>
-                                <eval>required</eval>
                             </config>
                         </TCEforms>
                     </accountKey>
+                    <blobEndpoint>
+                        <TCEforms>
+                            <label>blobEndpoint</label>
+                            <config>
+                                <type>input</type>
+                                <size>30</size>
+                            </config>
+                        </TCEforms>
+                    </blobEndpoint>
+                    <sasToken>
+                        <TCEforms>
+                            <label>sasToken</label>
+                            <config>
+                                <type>input</type>
+                                <size>30</size>
+                            </config>
+                        </TCEforms>
+                    </sasToken>
                 </el>
             </ROOT>
         </general>

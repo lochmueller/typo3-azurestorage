@@ -24,6 +24,7 @@ use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 
 class StorageDriver extends AbstractHierarchicalFilesystemDriver
@@ -33,6 +34,10 @@ class StorageDriver extends AbstractHierarchicalFilesystemDriver
      * @var string
      */
     private $container;
+
+    private $blobEndpoint;
+
+    private $sasToken;
 
     /**
      * @var string
@@ -90,6 +95,11 @@ class StorageDriver extends AbstractHierarchicalFilesystemDriver
     {
         parent::__construct($configuration);
 
+        // Preload classes
+        if (!class_exists(\MicrosoftAzure\Storage\Blob\Models\Blob::class, false)) {
+            require_once(GeneralUtility::getFileAbsFileName('EXT:azurestorage/Resources/Private/Contrib/vendor/autoload.php'));
+        }
+
         $this->capabilities = ResourceStorage::CAPABILITY_BROWSABLE | ResourceStorage::CAPABILITY_PUBLIC | ResourceStorage::CAPABILITY_WRITABLE | ResourceStorage::CAPABILITY_HIERARCHICAL_IDENTIFIERS;
         $this->cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('azurestorage');
     }
@@ -115,6 +125,8 @@ class StorageDriver extends AbstractHierarchicalFilesystemDriver
         $this->account = $this->configuration['accountName'];
         $this->accesskey = $this->configuration['accountKey'];
         $this->container = $this->configuration['containerName'];
+        $this->blobEndpoint = $this->configuration['blobEndpoint'];
+        $this->sasToken = $this->configuration['sasToken'];
 
         if ((bool)$this->configuration['usehttps'] === true) {
             $this->protocol = 'https';
@@ -140,6 +152,9 @@ class StorageDriver extends AbstractHierarchicalFilesystemDriver
         if (!empty($this->account) && !empty($this->accesskey) && !empty($this->container)) {
             $this->blobService = BlobRestProxy::createBlobService('
             DefaultEndpointsProtocol=' . $this->protocol . ';AccountName=' . $this->account . ';AccountKey=' . $this->accesskey);
+        } elseif(!empty($this->blobEndpoint) && !empty($this->sasToken)) {
+            $this->blobService = BlobRestProxy::createBlobService('
+            BlobEndpoint=' . $this->blobEndpoint . ';SharedAccessSignature="' . $this->sasToken.'"');
         }
     }
 
@@ -677,7 +692,16 @@ class StorageDriver extends AbstractHierarchicalFilesystemDriver
     {
         $fileInfo = [];
         if ($fileIdentifier === '') {
-            $properties = $this->blobService->getContainerProperties($this->container);
+            try {
+                $properties = $this->blobService->getContainerProperties($this->container);
+            }catch(\Exception $exception) {
+                return [
+                    'identifier' => $fileIdentifier,
+                    'name' => basename(rtrim($fileIdentifier, '/')),
+                    'storage' => $this->storageUid,
+                    'identifier_hash' => $this->hashIdentifier($fileIdentifier),
+                ];
+            }
         } else {
             /** @var GetBlobPropertiesResult $blob */
             $blob = $this->getBlobProperties($fileIdentifier);
@@ -783,13 +807,10 @@ class StorageDriver extends AbstractHierarchicalFilesystemDriver
             // $c is the counter for how many items we still have to fetch (-1 is unlimited)
             $c = $numberOfItems > 0 ? $numberOfItems : - 1;
 
-            while ($iterator->valid() && ($numberOfItems === 0 || $c > 0)) {
+            foreach ($iterator as $blob) {
 
                 /** @var Blob $blob */
-                $blob = $iterator->current();
                 $fileName = $blob->getName();
-                // go on to the next iterator item now as we might skip this one early
-                $iterator->next();
 
                 if (substr($fileName, -1) === '/') {
                     // folder
@@ -801,7 +822,6 @@ class StorageDriver extends AbstractHierarchicalFilesystemDriver
                     continue;
                 }
 
-
                 if ($start > 0) {
                     $start--;
                 } else {
@@ -811,6 +831,7 @@ class StorageDriver extends AbstractHierarchicalFilesystemDriver
                     // item here
                     --$c;
                 }
+
             }
             uksort($files, 'strnatcasecmp');
             if ($sortRev) {
