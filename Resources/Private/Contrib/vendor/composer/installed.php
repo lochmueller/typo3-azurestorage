@@ -3,7 +3,7 @@
         'name' => 'typo3/azure',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'dcda34ff6620850304e8101792b0dd73c80ffb4f',
+        'reference' => '1b5328dfa44a5f6a864f7cb44a33ed5972dfc00b',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -29,9 +29,9 @@
             'dev_requirement' => false,
         ),
         'guzzlehttp/psr7' => array(
-            'pretty_version' => '2.6.2',
-            'version' => '2.6.2.0',
-            'reference' => '45b30f99ac27b5ca93cb4831afe16285f57b8221',
+            'pretty_version' => '1.9.1',
+            'version' => '1.9.1.0',
+            'reference' => 'e4490cabc77465aaee90b20cfc9a770f8c04be6b',
             'type' => 'library',
             'install_path' => __DIR__ . '/../guzzlehttp/psr7',
             'aliases' => array(),
@@ -65,21 +65,6 @@
             'dev_requirement' => false,
         ),
         'psr/http-client-implementation' => array(
-            'dev_requirement' => false,
-            'provided' => array(
-                0 => '1.0',
-            ),
-        ),
-        'psr/http-factory' => array(
-            'pretty_version' => '1.0.2',
-            'version' => '1.0.2.0',
-            'reference' => 'e616d01114759c4c489f93b099585439f795fe35',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../psr/http-factory',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
-        'psr/http-factory-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
                 0 => '1.0',
@@ -121,7 +106,7 @@
         'typo3/azure' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'dcda34ff6620850304e8101792b0dd73c80ffb4f',
+            'reference' => '1b5328dfa44a5f6a864f7cb44a33ed5972dfc00b',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
